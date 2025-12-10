@@ -1,8 +1,7 @@
 CODE
 
 
-#pragma region VEXcode Generated Robot Configuration
-// Make sure all required headers are included.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -14,7 +13,7 @@ CODE
 
 using namespace vex;
 
-// Brain should be defined by default
+
 brain Brain;
 
 
@@ -33,13 +32,13 @@ brain Brain;
 
 
 
-// generating and setting random seed
+
 void initializeRandomSeed(){
   int systemTime = Brain.Timer.systemHighResolution();
   double batteryCurrent = Brain.Battery.current();
   double batteryVoltage = Brain.Battery.voltage(voltageUnits::mV);
 
-  // Combine these values into a single integer
+
   int seed = int(batteryVoltage + batteryCurrent * 100) + systemTime;
 
   // Set the seed
@@ -50,13 +49,12 @@ void initializeRandomSeed(){
 
 void vexcodeInit() {
 
-  //Initializing random seed.
+
   initializeRandomSeed(); 
 }
 
 
-// Helper to make playing sounds from the V5 in VEXcode easier and
-// keeps the code cleaner by making it clear what is happening.
+
 void playVexcodeSound(const char *soundName) {
   printf("VEXPlaySound:%s\n", soundName);
   wait(5, msec);
@@ -66,24 +64,24 @@ void playVexcodeSound(const char *soundName) {
 #include "vex.h"
 using namespace vex;
 
-// ===== 하드웨어 =====
+
 brain       Brain;
 controller  Controller1;
 
-// 드라이브 (뒤바퀴)
+
 motor LeftMotor (PORT1,  ratio18_1, false);
 motor RightMotor(PORT10, ratio18_1, true);
 
-// 클로 (집게)
+
 motor ClawMotor (PORT6,  ratio18_1, false);
 
-// 암 (팔)
-motor ArmMotor  (PORT7,  ratio36_1, false);   // ⚙️ 새로 추가한 모터 (포트 7 예시, 실제 포트 번호로 바꿔도 됨)
 
-// ===== 파라미터 =====
-int DRIVE_SCALE = 35;   // 주행 속도 %
-int CLAW_SCALE  = 20;   // 클로 속도 %
-int ARM_SCALE   = 25;   // 팔 속도 %
+motor ArmMotor  (PORT7,  ratio36_1, false);   
+
+
+int DRIVE_SCALE = 35;   
+int CLAW_SCALE  = 20;  
+int ARM_SCALE   = 25;   
 constexpr int DEADBAND  = 5;
 
 inline int applyDeadband(int v, int dead = DEADBAND) {
@@ -103,8 +101,8 @@ int main() {
   ArmMotor.setStopping(hold);
 
   while (true) {
-    // === 주행 ===
-    int fwd  = -applyDeadband(Controller1.Axis3.position()); // 전/후 반전 수정
+
+    int fwd  = -applyDeadband(Controller1.Axis3.position());
     int turn =  applyDeadband(Controller1.Axis1.position());
 
     int leftCmd  = clamp100((fwd + turn) * DRIVE_SCALE / 100);
@@ -113,7 +111,7 @@ int main() {
     LeftMotor.spin(forward,  leftCmd,  percent);
     RightMotor.spin(forward, rightCmd, percent);
 
-    // === 클로 (L1 + 오른스틱 세로 Axis2) ===
+
     if (Controller1.ButtonL1.pressing()) {
       int clawIn = applyDeadband(Controller1.Axis2.position());
       if (clawIn != 0) {
@@ -126,7 +124,7 @@ int main() {
       ClawMotor.stop(hold);
     }
 
-    // === 암 (L2 + 오른스틱 세로 Axis2) ===
+
     if (Controller1.ButtonL2.pressing()) {
       int armIn = applyDeadband(Controller1.Axis2.position());
       if (armIn != 0) {
@@ -139,7 +137,7 @@ int main() {
       ArmMotor.stop(hold);
     }
 
-    // === 속도 토글 ===
+
     if (Controller1.ButtonA.pressing()) DRIVE_SCALE = 40;
     if (Controller1.ButtonB.pressing()) DRIVE_SCALE = 70;
 
